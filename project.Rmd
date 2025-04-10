@@ -9,14 +9,32 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown hello collaborators
+## CATAN
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+1) At least one function you created
+      choose 
+2) Data manipulation
+      add colors to data
+      
+3) Statistical analysis
+      t.test
+      
+      
+4) Plots
+    win/lose stuff
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+5) Introduce at least one function from CRAN that hasn’t
+been used in class
+    simiulate Catan game?
+    
+6) Rmarkdown file (this is your final report)
+    this file
+
+
+
+```{r Catan}
+
 ```
 
 ## Including Plots
