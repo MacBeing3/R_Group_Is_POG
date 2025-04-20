@@ -26,23 +26,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 5) Introduce at least one function from CRAN that hasn’t
 been used in class
-    simiulate Catan game?
+    simulate Catan game?
     
 6) Rmarkdown file (this is your final report)
     this file
 
+```{r Data Manipulation}
+# Reading in Catan data from data folder
+CatanData <- read.csv(file = 'data/catanstats.csv', header = TRUE)
 
+# Creating object that has all of the desired colors
+colors <- c("red", "blue", "white", "orange")
 
-```{r Catan}
-
+# Creating new variable for color
+# Split separates the observations by game Num, 50 groups for 50 games
+# lapply does the random sample of colors for each group within each group
+# This way, each color is found in each game without repeats within games
+# Unlist separates data back into individual observations
+CatanData$color <- unlist(
+  lapply(split(CatanData, CatanData$gameNum), function(group)
+    sample(colors))
+  )
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
