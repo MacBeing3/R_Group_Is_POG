@@ -11,26 +11,66 @@ set.seed(123)
 
 # ----- 1. Simulate Mock Catan Data -----
 
-# Simulate 200 player-game entries (4 players x 50 games)
-n <- 200
-catan_data <- data.frame(
-  player_id = rep(1:4, times = 50),
-  game_id = rep(1:50, each = 4),
-  turn_order = rep(1:4, times = 50),
-  
-  tile1_num = sample(c(2:12), n, replace = TRUE),
-  tile1_res = sample(c("wood", "brick", "wheat", "sheep", "ore"), n, replace = TRUE),
-  tile2_num = sample(c(2:12), n, replace = TRUE),
-  tile2_res = sample(c("wood", "brick", "wheat", "sheep", "ore"), n, replace = TRUE),
-  tile3_num = sample(c(2:12), n, replace = TRUE),
-  tile3_res = sample(c("wood", "brick", "wheat", "sheep", "ore"), n, replace = TRUE),
-  
-  final_points = round(runif(n, 5, 10), 1)
+CatanData <- read.csv(file = 'data/catanstats.csv', header = TRUE)
+
+# Creating object that has all of the desired colors
+colors <- c("red", "blue", "white", "orange")
+
+# Creating new variable for color
+# Split separates the observations by game Num, 50 groups for 50 games
+# lapply does the random sample of colors for each group within each group
+# This way, each color is found in each game without repeats within games
+# Unlist separates data back into individual observations
+CatanData$color <- unlist(
+  lapply(split(CatanData, CatanData$gameNum), function(group)
+    sample(colors))
 )
 
+CatanData[c(
+  "X1settlersc1", 
+  "X1settlersc2", 
+  "X1settlersc3",
+  "X2settlersc1", 
+  "X2settlersc2", 
+  "X2settlersc3"
+)] <- lapply(CatanData[c(
+  "X1settlersc1", 
+  "X1settlersc2", 
+  "X1settlersc3",
+  "X2settlersc1", 
+  "X2settlersc2", 
+  "X2settlersc3"
+)], function(col) {
+  replace(col, is.na(col), "A")
+})
+
+
+
+input_game <- CatanData #will be replaced when turn into function
+
+# Simulate 200 player-game entries (4 players x 50 games)
+n <- 200
+
+#subset of data for analysis
+
+
 # Assign 1 winner per game
-winners <- sample(1:4, 50, replace = TRUE)
-catan_data$win <- catan_data$turn_order == rep(winners, each = 4)
+
+#losing is the default state
+input_game$win <- rep(FALSE,n)
+
+for(game in 1:50){
+  
+  maybe_win <- input_game$player[input_game$points >= 10 & input_game$gameNum == game]
+  
+  win_player <- min(maybe_win)
+  
+  input_game$win[((game-1)*4) +win_player] <- TRUE
+  
+}
+
+input_game$player[input_game$win == TRUE]
+
 
 # ----- 2. Feature Engineering -----
 
@@ -42,26 +82,52 @@ prob_lookup <- c(
 )
 
 # Calculate average probability and other features
-catan_data <- catan_data %>%
+input_game <- input_game %>%
   rowwise() %>%
-  mutate(
+  mutate( #issue is that number is sometimes zero in the third one
     avg_prob = sum(
-      prob_lookup[as.character(tile1_num)],
-      prob_lookup[as.character(tile2_num)],
-      prob_lookup[as.character(tile3_num)]
+      prob_lookup[as.character(X1settlenum1)],
+      prob_lookup[as.character(X1settlenum2)],
+      prob_lookup[as.character(X1settlenum3)],
+      
+      prob_lookup[as.character(X2settlenum1)],
+      prob_lookup[as.character(X2settlenum2)],
+      prob_lookup[as.character(X2settlenum3)]
     ),
-    resource_diversity = n_distinct(c(tile1_res, tile2_res, tile3_res)),
-    has_wood = as.integer("wood" %in% c(tile1_res, tile2_res, tile3_res)),
-    has_brick = as.integer("brick" %in% c(tile1_res, tile2_res, tile3_res))
+    resource_diversity = n_distinct(c(
+      X1settlersc1, 
+      X1settlersc2, 
+      X1settlersc3,
+      X2settlersc1, 
+      X2settlersc2, 
+      X2settlersc3)),
+    
+    has_wood = as.integer("L" %in% c(
+      X1settlersc1, 
+      X1settlersc2, 
+      X1settlersc3,
+      X2settlersc1, 
+      X2settlersc2, 
+      X2settlersc3)),
+    
+    has_brick = as.integer("C" %in% c(
+      X1settlersc1, 
+      X1settlersc2, 
+      X1settlersc3,
+      X2settlersc1, 
+      X2settlersc2, 
+      X2settlersc3))
   ) %>%
   ungroup()
 
 # ----- 3. Train/Test Split -----
+simplified_input <- input_game[-c(4:15,28:36)]
+
 
 set.seed(42)
-train_index <- createDataPartition(catan_data$win, p = 0.8, list = FALSE)
-train_data <- catan_data[train_index, ]
-test_data <- catan_data[-train_index, ]
+train_index <- createDataPartition(simplified_input$win, p = 0.8, list = FALSE)
+train_data <- simplified_input[train_index, ]
+test_data <- simplified_input[-train_index, ]
 
 # ----- 4. Train Random Forest Model -----
 
@@ -71,7 +137,7 @@ train_data$win <- as.factor(train_data$win)
 test_data$win <- as.factor(test_data$win)
 
 rf_model <- randomForest(
-  win ~ avg_prob + resource_diversity + has_wood + has_brick + turn_order,
+  win ~ avg_prob + resource_diversity + has_wood + has_brick + player,
   data = train_data,
   importance = TRUE
 )
@@ -85,7 +151,7 @@ test_data$predicted_prob <- pred_probs
 # ----- 5. Results & Plots -----
 
 # View predictions
-print(head(test_data %>% select(player_id, game_id, win, predicted_prob)))
+print(head(test_data %>% select(player, gameNum, win, predicted_prob)))
 ## look at this ^^^^^^^
 
 # Show feature importance

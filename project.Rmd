@@ -44,8 +44,13 @@ colors <- c("red", "blue", "white", "orange")
 # This way, each color is found in each game without repeats within games
 # Unlist separates data back into individual observations
 CatanData$color <- unlist(
-  lapply(split(CatanData, CatanData$gameNum), function(group)
+  lapply(
+    split(CatanData, CatanData$gameNum),
+    function(group)
     sample(colors))
   )
+
+
+
 ```
 
