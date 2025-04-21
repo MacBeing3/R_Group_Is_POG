@@ -6,47 +6,19 @@ library(dplyr)
 library(caret)
 library(randomForest)
 
+predictCatan <- function(gameData){
+  
+  
+
+
 # Set seed for reproducibility
 set.seed(123)
 
 # ----- 1. Simulate Mock Catan Data -----
 
-CatanData <- read.csv(file = 'data/catanstats.csv', header = TRUE)
-
-# Creating object that has all of the desired colors
-colors <- c("red", "blue", "white", "orange")
-
-# Creating new variable for color
-# Split separates the observations by game Num, 50 groups for 50 games
-# lapply does the random sample of colors for each group within each group
-# This way, each color is found in each game without repeats within games
-# Unlist separates data back into individual observations
-CatanData$color <- unlist(
-  lapply(split(CatanData, CatanData$gameNum), function(group)
-    sample(colors))
-)
-
-CatanData[c(
-  "X1settlersc1", 
-  "X1settlersc2", 
-  "X1settlersc3",
-  "X2settlersc1", 
-  "X2settlersc2", 
-  "X2settlersc3"
-)] <- lapply(CatanData[c(
-  "X1settlersc1", 
-  "X1settlersc2", 
-  "X1settlersc3",
-  "X2settlersc1", 
-  "X2settlersc2", 
-  "X2settlersc3"
-)], function(col) {
-  replace(col, is.na(col), "A")
-})
 
 
-
-input_game <- CatanData #will be replaced when turn into function
+input_game <- gameData #will be replaced when turn into function
 
 # Simulate 200 player-game entries (4 players x 50 games)
 n <- 200
@@ -75,7 +47,7 @@ input_game$player[input_game$win == TRUE]
 # ----- 2. Feature Engineering -----
 
 # Dice number to probability lookup
-prob_lookup <- c(
+prob_lookup <- c("0"=0,
   "2" = 1/36, "3" = 2/36, "4" = 3/36, "5" = 4/36,
   "6" = 5/36, "7" = 0, "8" = 5/36, "9" = 4/36,
   "10" = 3/36, "11" = 2/36, "12" = 1/36
@@ -157,3 +129,6 @@ print(head(test_data %>% select(player, gameNum, win, predicted_prob)))
 # Show feature importance
 print(importance(rf_model))
 varImpPlot(rf_model)
+
+
+}

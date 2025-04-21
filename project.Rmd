@@ -12,9 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ## CATAN
 
 1) At least one function you created
-      choose 
+      predictCatan()
+      
 2) Data manipulation
       add colors to data
+      creating new variables from input data for predicting Ctan
       
 3) Statistical analysis
       t.test
@@ -26,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 5) Introduce at least one function from CRAN that hasn’t
 been used in class
-    simulate Catan game?
+    caret, randomforest
     
 6) Rmarkdown file (this is your final report)
     this file
@@ -54,3 +56,13 @@ CatanData$color <- unlist(
 
 ```
 
+```{r do_game,echo=TRUE,warning=FALSE,message=FALSE}
+
+
+source("./simulatingCatan.R")
+
+#to give the stats n plot for a Catan game, just enter a dataset of 4-player x 50 games (like the original)
+predictCatan(CatanData)
+
+
+```
