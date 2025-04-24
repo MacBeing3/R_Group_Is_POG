@@ -39,7 +39,7 @@ win_rate_color <- CatanData %>%
 
 ggplot(win_rate_color, aes(x = color, y = win_rate, fill = color)) +
   geom_col() +  # Use 'geom_col' to create a bar plot
-  scale_fill_manual(values = c("royalblue2", "darkgoldenrod1", "brown2", "aliceblue")) +  # Assign custom colors to each bar
+  scale_fill_manual(values = c("royalblue2", "darkgoldenrod1", "brown2", "snow2")) +  # Assign custom colors to each bar
   scale_y_continuous(labels = scales::percent_format()) +
   labs(title = "Win Rate by Color",
        x = "Color",
