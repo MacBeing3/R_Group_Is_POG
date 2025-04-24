@@ -1,13 +1,11 @@
 # Load necessary packages
-install.packages("tidyverse")
 library(tidyverse)
 
 # Load your data
-setwd("/Users/Kaseysmith/Desktop/Bootstrap/Data")
-catan_data <- read_csv("catanstats (2).csv")
+catan_data <- read_csv("./data/catanstats.csv")
 
 # View the structure
-glimpse(catan_data)
+#glimpse(catan_data)
 
 # Add a column identifying game number (assuming 4 players per game)
 catan_data <- catan_data %>%
@@ -22,7 +20,7 @@ winners <- catan_data %>%
 ### Bootstrapping, simulating winners sample ###
 set.seed(42)
 
-n_iterations <- 10000
+n_iterations <- 1000 #10000
 
 bootstrap_results <- map_dfr(1:n_iterations, function(i) {
   sample_winners <- winners %>%
