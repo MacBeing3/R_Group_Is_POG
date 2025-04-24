@@ -96,6 +96,7 @@ predictCatan <- function(gameData, model) {
   pred_input <- processed_data %>%
     select(avg_prob, resource_diversity, has_wood, has_brick, player)
   
+  
   # Predict
   probs <- predict(model, newdata = pred_input, type = "prob")[, "TRUE"]
   return(probs)
@@ -151,8 +152,8 @@ rf_model <- trainCatanModel(CatanData)
 all_probs <- predictCatan(CatanData, rf_model)
 
 # Compare row 2
-cat("Row 2 via predictCatan = ", all_probs[2], "\n")
-cat("Row 2 via predictCatanPlayer = ", predictCatanPlayer(CatanData[2, ], rf_model), "\n")
+#cat("Row 2 via predictCatan = ", all_probs[2], "\n")
+#cat("Row 2 via predictCatanPlayer = ", predictCatanPlayer(CatanData[2, ], rf_model), "\n")
 
 
 

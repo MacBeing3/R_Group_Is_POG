@@ -11,27 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## CATAN
 
-1) At least one function you created
-      predictCatan()
-      
-2) Data manipulation
-      add colors to data
-      creating new variables from input data for predicting Ctan
-      
-3) Statistical analysis
-      t.test
-      
-      
-4) Plots
-    win/lose stuff
-
-
-5) Introduce at least one function from CRAN that hasn’t
-been used in class
-    caret, randomforest
-    
-6) Rmarkdown file (this is your final report)
-    this file
+we wanted to add color as a random variable that *should* have no effect, as we are generating it randomly
 
 ```{r Data Manipulation}
 # Reading in Catan data from data folder
@@ -40,11 +20,7 @@ CatanData <- read.csv(file = 'data/catanstats.csv', header = TRUE)
 # Creating object that has all of the desired colors
 colors <- c("red", "blue", "white", "orange")
 
-# Creating new variable for color
-# Split separates the observations by game Num, 50 groups for 50 games
-# lapply does the random sample of colors for each group within each group
-# This way, each color is found in each game without repeats within games
-# Unlist separates data back into individual observations
+#applies all 4 colors per game with no repeats
 CatanData$color <- unlist(
   lapply(
     split(CatanData, CatanData$gameNum),
@@ -56,163 +32,45 @@ CatanData$color <- unlist(
 
 ```
 
-```{r do_game,echo=TRUE,warning=FALSE,message=FALSE}
+
+
+
+Here we are gonna train a rainforest model thingy based on our 50 games 
+
+
+```{r do_game,echo=TRUE,warning=FALSE}
+#,message=FALSE
+
 
 
 source("./simulatingCatan.R")
 
 #to give the stats n plot for a Catan game, just enter a dataset of 4-player x 50 games (like the original)
-predictCatan(CatanData)
+
+
+predictCatan(CatanData,rf_model)
+
+#predictCatanPlayer(player, rfmodel)
+
+```
+
+Here are the "importance" values for the rf_model. To simplify, this refers to how important a variable is in predicting the likelihood of winning
+
+```{r importance}
+
+print(importance(rf_model))
 
 
 ```
-```{r bootstrap,echo=TRUE,warning=FALSE,message=FALSE}
 
 
-#library(tidyverse)
-
-
-### Bootstrapping, simulating winners sample ###
-#set.seed(42)
-
-#numBootStraps <- 10 #10000
-
-
-
-#sample from OG data to create new data
-#do PredictCatan()
-# sample_games <-vector("list", numBootStraps)
-# 
-# #generate sample game sets
-# for(games in 1:numBootStraps){
-#   new_data <- CatanData
-#   
-#   #for each thing we wanna rewrite, we sample
-#   
-#   new_data$item <- sample(CatanData$item,200,replace=TRUE )
-#   
-# }
-
- #bs_results <- matrix(,numBootStraps,1)
-# 
-# 
-# for(tests in 1:numBootStraps){
-#   bs_diethrows[,tests]<- #predictcatan() sample(diethrows,actual_sample, replace = TRUE)
-#   
-# }
-# 
-# #gets bs means 
-# bs_sample_means <- colMeans(bs_diethrows)
-# 
-# bs_total_mean <- mean(bs_sample_means)
-# Load necessary packages
-library(tidyverse)
-
-# Load your data
-catan_data <- read_csv("./data/catanstats.csv")
-
-# View the structure
-#glimpse(catan_data)
-
-# Add a column identifying game number (assuming 4 players per game)
-catan_data <- catan_data %>%
-  mutate(game_id = rep(1:(n()/4), each = 4))
-
-# Mark the winner in each game
-winners <- catan_data %>%
-  group_by(game_id) %>%
-  mutate(winner = ifelse(points == max(points), 1, 0)) %>%
-  ungroup()
-
-### Bootstrapping, simulating winners sample ###
-set.seed(42)
-
-n_iterations <- 100 #10000
-
-bootstrap_results <- map_dfr(1:n_iterations, function(i) {
-  sample_winners <- winners %>%
-    sample_frac(replace = TRUE)
-  sample_winners %>%
-    select('1settlersc1', '1settlersc2', '1settlersc3') %>%
-    pivot_longer(cols = everything(), names_to = "slot", values_to = "resource") %>%
-    count(resource) %>%
-    mutate(iteration = i)
-})
-
-# Summarizing the data#
-summary <- bootstrap_results %>%
-  group_by(resource) %>%
-  summarise(mean_count = mean(n), .groups = "drop") %>%
-  arrange(desc(mean_count))
-
-print(summary)
-
-###Key Takeaways: 
-# Wood, Ore, and Sheep seem to be the most important resources for starting a winning settlement, as they have the highest mean counts.
-# Resources like Clay, Desert, and combinations like 2 Sheep (2S) or 3 Gold (3G) seem to be less important.
-# If your strategy is to pick starting resources that lead to the most wins, focusing on Wood (W) and Ore (O), followed by Sheep (S) and Wheat (L) might be a strong choice.
-
-###Incorperating wieght of Token count (# associated with the resource)
-library(ggplot2)
-
-# Create the plot
-ggplot(summary, aes(x = reorder(resource, -mean_count), y = mean_count)) +
-  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
-  labs(
-    title = "Average Frequency of Resources in Winning First Settlements",
-    x = "Resource",
-    y = "Mean Count",
-    caption = "Based on 10,000 bootstrap iterations"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
-
-#Creating a weighting function
-
-# Assuming each resource is tied to a specific number token in your dataset
-resource_weights <- tibble(
-  resource = c("W", "O", "S", "L", "C", "2S", "D", "3G", "2L", "2W"),
-  token = c(6, 8, 5, 10, 3, 12, 2, 11, 4, 9)
-)
-
-# Frequency weights based on the number token roll probabilities
-number_weights <- tibble(
-  token = c(6, 8, 5, 9, 4, 10, 3, 11, 2, 12),
-  weight = c(5/36, 5/36, 4/36, 4/36, 3/36, 3/36, 2/36, 2/36, 1/36, 1/36)
-)
-
-# Join the resource weights with the number weights
-# First, ensure the summary table contains 'resource' and 'mean_count'
-weighted_resources <- summary %>%
-  left_join(resource_weights, by = "resource") %>%
-  left_join(number_weights, by = "token") %>%
-  mutate(weighted_count = mean_count * weight)
-
-# Check the result
-weighted_resources
-
-#Visualizing weighted counts#
-# Plot the weighted resources
-ggplot(weighted_resources, aes(x = reorder(resource, -weighted_count), y = weighted_count)) +
-  geom_bar(stat = "identity", fill = "lightgreen", color = "black") +
-  labs(
-    title = "Weighted Average Frequency of Resources in Winning First Settlements",
-    x = "Resource",
-    y = "Weighted Mean Count",
-    caption = "Weights based on Catan number token roll probabilities"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-#interpreting#
-# Higher weighted mean counts indicate that a resource is not only common in winning first settlements but also tied to highly valuable tiles that are rolled frequently in the game (like 6 or 8).
-# Lower weighted mean counts indicate that a resource may appear in settlements but is associated with less frequent tiles (like 2 or 12), or it might just not be as influential in winning settlements.
-
-
-
+```{r graphs,echo=TRUE,warning=FALSE,message=FALSE}
 
 
 
 
 
 ```
+
+
+
