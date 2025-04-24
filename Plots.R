@@ -6,11 +6,11 @@ library(tidyverse)
 
 library(ggplot2)
 
-##win rate by player turn 
-
-wins_only <- CatanData %>%
-  filter(winloss == "Win")
-
+##Win rate by player turn 
+##Group data by player turn order
+##Calculate the total games played by each player
+##Calculate the number of wins
+##Compute the win rate for each turn position
 win_rate_player <- CatanData %>%
   group_by(player) %>%
   summarise(
@@ -18,7 +18,7 @@ win_rate_player <- CatanData %>%
     wins = sum(winloss == "Win"),
     win_rate = wins / total
   )
-
+##Create graph
 ggplot(win_rate_player, aes(x = factor(player), y = win_rate, fill = factor(player))) +
   geom_col() +
   labs(title = "Win Rate by Turn Position",
@@ -28,7 +28,8 @@ ggplot(win_rate_player, aes(x = factor(player), y = win_rate, fill = factor(play
   scale_y_continuous(labels = scales::percent) +
   theme_minimal()
 
-##win rate by color 
+##Win rate by color 
+##Calculate win rate by player color
 win_rate_color <- CatanData %>%
   group_by(color) %>%
   summarise(
@@ -36,9 +37,9 @@ win_rate_color <- CatanData %>%
     wins = sum(winloss == "Win"),
     win_rate = wins / total
   )
-
+##Create Graph
 ggplot(win_rate_color, aes(x = color, y = win_rate, fill = color)) +
-  geom_col() +  # Use 'geom_col' to create a bar plot
+  geom_col() +  
   scale_fill_manual(values = c("royalblue2", "darkgoldenrod1", "brown2", "snow2")) +  # Assign custom colors to each bar
   scale_y_continuous(labels = scales::percent_format()) +
   labs(title = "Win Rate by Color",
@@ -46,7 +47,10 @@ ggplot(win_rate_color, aes(x = color, y = win_rate, fill = color)) +
        y = "Win Rate") +
   theme_minimal()
 
-##win rate resource
+##Win rate resource
+##Convert wide format (many settlenumX/settlerscX columns) to long format
+##Each row becomes one settlement's number and resource
+##Rename columns for clarity
 Catan_long <- CatanData %>%
   pivot_longer(
     cols = matches("settlenum|settlersc"),
@@ -54,7 +58,8 @@ Catan_long <- CatanData %>%
     names_pattern = "(\\dsettle)(num\\d|rsc\\d)"
   ) %>%
   rename(number = num1, resource = rsc1)  # fix names for consistency
-
+##Clean/filter data
+##Convert to numeric
 Catan_long <- Catan_long %>%
   mutate(
     number = as.numeric(number),
@@ -62,7 +67,7 @@ Catan_long <- Catan_long %>%
     resource = ifelse(str_detect(resource, "^[A-Z]$"), resource, NA)
   ) %>%
   drop_na(number, resource)
-
+##Calculate win rate based on each resource type seen in starting settlements
 win_rate_resource <- Catan_long %>%
   group_by(resource) %>%
   summarise(
@@ -70,10 +75,9 @@ win_rate_resource <- Catan_long %>%
     wins = sum(winloss == "Win"),
     win_rate = wins / total
   )
-
+##Map single-letter resource codes to full names
 label_map <- c("L" = "Lumber", "C" = "Clay", "S" = "Sheep", "W" = "Wheat", "O" = "Ore")
-
-# Generate the plot
+##Create Graph
 ggplot(win_rate_resource, aes(x = resource, y = win_rate, fill = resource)) +
   geom_col() +
   scale_fill_manual(values = c("L" = "forestgreen",    # Lumber (L) = Green
