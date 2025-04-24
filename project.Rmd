@@ -11,6 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## CATAN
 
+### Intro
+
+  what is Catan, where we got our data
+
+  goal: compare descriptive trends in the Catan data with what a randomforest model predicts what are most important factors
+
+  "LIE" : using just descriptive
+
+  "TRUTH": using randomforest model as a more reliable way to show what is actually important. While also knowing that it is incomplete
+
+
+## Modifying Data
 we wanted to add color as a random variable that *should* have no effect, as we are generating it randomly
 
 ```{r Data Manipulation}
@@ -36,8 +48,9 @@ CatanData$color <- unlist(
 
 
 
-Here we are gonna train a rainforest model thingy based on our 50 games 
+Here we are gonna train a randomforest model thingy based on our 50 games. This allows us to compare descriptive information (graphs) with the randomforest model to determine predictors of winning
 
+Dawson can write most/all of this ^^
 
 ```{r do_game,echo=TRUE,warning=FALSE,message=FALSE}
 #,message=FALSE
@@ -57,6 +70,8 @@ predictCatan(CatanData,rf_model)
 
 Here are the "importance" values for the rf_model. To simplify, this refers to how important a variable is in predicting the likelihood of winning
 
+Dawson can write most/all of this ^^
+
 ```{r importance}
 
 print(importance(rf_model))
@@ -70,10 +85,14 @@ print(predictCatanPlayer)
 
 ```
 
+## Descriptive Data Graphs
+
+Here are graphs showing descriptive characteritics of the oringal CatanData dataset.  
+
 
 ```{r graphs,echo=TRUE,warning=FALSE,message=FALSE}
 
-
+#determining winner based on the first player to have >=10 points
 CatanData$winloss <- rep("Loss", nrow(CatanData))
 
 for (game in unique(CatanData$gameNum)) {
@@ -181,5 +200,42 @@ ggplot(win_rate_resource, aes(x = resource, y = win_rate, fill = resource)) +
 
 ```
 
+## Bootstrap?
 
+do we source the bootstrap file or is that kinda too much stuff at this point
+
+
+## Conclusions
+
+### Conclusions based on Graphs
+
+  player 2 is the best, I think wheat is the best not sure  
+  
+  just describe what the plots would suggest is important
+  
+  
+  
+### Conclusions based on RandomForest
+
+  probaly will put up the importance chart thing again
+  
+  explain what it probably means
+  
+  
+  
+### Differences
+
+  explain what is different quickly
+  
+  
+  probably will put in a short predictCatanPlayer() thing where we will only differ the color, to show how that compares with the graphs
+  
+  any difference with color being significant should mean nothing
+  
+  
+## yippee we done
+
+short goodbe conclusion
+  
+  
 
