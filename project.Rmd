@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## Modifying Data
-we wanted to add color as a random variable that *should* have no effect, as we are generating it randomly
+One factor of board games that a lot of people are passionate about is the color of their game piece. It is an easy thing to get superstitious over as a result of attachment to their preferred color. The Catan data set did not have color listed as a variable, but we figured that people might be willing to interpret data about whether a color was more associated with wins, particularly if their color was favored. So, we started by manipulating the data set to include a variable for color. We set the seed and then randomly assigned colors to each of the four players in each game. 
 
 ```{r Data Manipulation}
 # Reading in Catan data from data folder
@@ -89,6 +89,7 @@ print(predictCatanPlayer)
 
 Here are graphs showing descriptive characteritics of the oringal CatanData dataset.  
 
+The second graph depicts the win rate by color. Based on the random data from the seed, more winners tend to pick blue, and the fewest winners tend to pick orange. Taking this data at face value, it seems that picking blue results in a significantly greater chance of winning a game of Catan than picking orange does. Those whose preferred color is blue might be inclined to believe these results, even though they are fully randomized within the 50 games of data and should have no real effect on game outcome.
 
 ```{r graphs,echo=TRUE,warning=FALSE,message=FALSE}
 
