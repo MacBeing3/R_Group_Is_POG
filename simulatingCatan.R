@@ -10,6 +10,8 @@ library(randomForest)
 
 
 trainCatanModel <- function(full_data) {
+  
+  
   # Label winners per game
   full_data$win <- rep(FALSE, nrow(full_data))
   for (game in unique(full_data$gameNum)) {
@@ -99,7 +101,7 @@ predictCatan <- function(gameData, model) {
   
   # Predict
   probs <- predict(model, newdata = pred_input, type = "prob")[, "TRUE"]
-  return(probs)
+  #return(probs)
 }
 
 
