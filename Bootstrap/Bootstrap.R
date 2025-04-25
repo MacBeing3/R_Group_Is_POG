@@ -106,3 +106,4 @@ ggplot(weighted_resources, aes(x = reorder(resource, -weighted_count), y = weigh
 
 
 
+

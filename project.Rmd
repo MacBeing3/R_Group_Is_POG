@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## CATAN
 
+# we need this
 ### Intro
 
   what is Catan, where we got our data
@@ -23,7 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## Modifying Data
-One factor of board games that a lot of people are passionate about is the color of their game piece. It is an easy thing to get superstitious over as a result of attachment to their preferred color. The Catan data set did not have color listed as a variable, but we figured that people might be willing to interpret data about whether a color was more associated with wins, particularly if their color was favored. So, we started by manipulating the data set to include a variable for color. We set the seed and then randomly assigned colors to each of the four players in each game. 
+One factor of board games that a lot of people are passionate about is the color of their game piece. It is an easy thing to get superstitious over as a result of attachment to their preferred color. The Catan data set did not have color listed as a variable, but we figured that people might be willing to interpret data about whether a color was more associated with wins, particularly if their color was favored. So, we started by manipulating the data set to include a variable for color. We set the seed and then randomly assigned colors to each of the four players in each game. As it was randomly sampled, with no connection to the original data, there are no *real* correlations to be found.
 
 ```{r Data Manipulation}
 # Reading in Catan data from data folder
@@ -46,7 +47,7 @@ CatanData$color <- unlist(
 ```
 
 
-
+# We need this
 
 Here we are gonna train a randomforest model thingy based on our 50 games. This allows us to compare descriptive information (graphs) with the randomforest model to determine predictors of winning
 
@@ -57,41 +58,70 @@ Dawson can write most/all of this ^^
 
 
 
-source("./simulatingCatan.R")
+#source("./simulatingCatan.R")
 
 #to give the stats n plot for a Catan game, just enter a dataset of 4-player x 50 games (like the original)
 
 
-predictCatan(CatanData,rf_model)
 
 #predictCatanPlayer(player, rfmodel)
 
 ```
 
+# we need this 
+
 Here are the "importance" values for the rf_model. To simplify, this refers to how important a variable is in predicting the likelihood of winning
 
-Dawson can write most/all of this ^^
+
+
+  First we need to train the model on our data
+  
+  
+```{r training, file = 'TrainRFModel.R'}
+
+
+```
+
+```{r train_now}
+rf_model <- trainCatanModel(CatanData)
+
+```
+
+
+  Then we create functions to easily calculate the probability of winning (without going through all this every single time). One function is to predict for an entire set of 50 games, while the other is just for predicting based on one player's game stats.
+```{r, file = 'simulatingCatan.R'} 
+
+```
+
+  The predicted probability of winning for every single player of every game (over 200 lines) is a lot, but the "importance" analysis of the model helps to understand what factors are relevant to predicting a win. 
+
+```{r importance}
+importance(rfmodel)
+
+```
+
+  Essentially
 
 ```{r importance}
 
-print(importance(rf_model))
 
-print(trainCatanModel)
+#print(predictCatan)
 
-print(predictCatan)
-
-print(predictCatanPlayer)
-
+#print(predictCatanPlayer)
+#file='your-script.R'
 
 ```
 
 ## Descriptive Data Graphs
 
+
+### Win rate by Color
 Here are graphs showing descriptive characteritics of the oringal CatanData dataset.  
 
-The second graph depicts the win rate by color. Based on the random data from the seed, more winners tend to pick blue, and the fewest winners tend to pick orange. Taking this data at face value, it seems that picking blue results in a significantly greater chance of winning a game of Catan than picking orange does. Those whose preferred color is blue might be inclined to believe these results, even though they are fully randomized within the 50 games of data and should have no real effect on game outcome.
+# *describe win by turn num*
 
-```{r graphs,echo=TRUE,warning=FALSE,message=FALSE}
+
+```{r win_by_turn_num,echo=TRUE,warning=FALSE,message=FALSE}
 
 #determining winner based on the first player to have >=10 points
 CatanData$winloss <- rep("Loss", nrow(CatanData))
@@ -131,6 +161,13 @@ ggplot(win_rate_player, aes(x = factor(player), y = win_rate, fill = factor(play
   scale_y_continuous(labels = scales::percent) +
   theme_minimal()
 
+```
+
+The second graph depicts the win rate by color. Based on the random data from the seed, more winners tend to pick blue, and the fewest winners tend to pick orange. Taking this data at face value, it seems that picking blue results in a significantly greater chance of winning a game of Catan than picking orange does. Those whose preferred color is blue might be inclined to believe these results, even though they are fully randomized within the 50 games of data and should have no real effect on game outcome.
+
+
+```{r win_color}
+
 ##win rate by color 
 win_rate_color <- CatanData %>%
   group_by(color) %>%
@@ -149,6 +186,18 @@ ggplot(win_rate_color, aes(x = color, y = win_rate, fill = color)) +
        y = "Win Rate") +
   theme_minimal()
 
+
+
+```
+
+
+### Win Rate by Starting Resource
+
+  This graph highlights the impact of starting resources on winning likelihood. Wheat clearly stands out as the most winning-associated resource, followed by ore, sheep, wood (logs), and finally brick (clay). If you’re aiming for the best shot at victory, prioritizing wheat-heavy placements is a strong strategic move. The data also shows that starting with two of the same resource or building near the desert significantly decreases your chances — variety and access are key in early-game planning.
+
+
+
+```{r win_resource}
 ##win rate resource
 Catan_long <- CatanData %>%
   pivot_longer(
@@ -201,10 +250,7 @@ ggplot(win_rate_resource, aes(x = resource, y = win_rate, fill = resource)) +
 
 ```
 
-## Bootstrap?
-
-do we source the bootstrap file or is that kinda too much stuff at this point
-
+# we nee conclusion
 
 ## Conclusions
 
@@ -229,7 +275,7 @@ do we source the bootstrap file or is that kinda too much stuff at this point
   explain what is different quickly
   
   
-  probably will put in a short predictCatanPlayer() thing where we will only differ the color, to show how that compares with the graphs
+  probably will put in a short predictCatanPlayer() thing where we will only differ the color, to show how that compares with the gra  phs
   
   any difference with color being significant should mean nothing
   
