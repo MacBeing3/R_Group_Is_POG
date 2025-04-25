@@ -1,34 +1,26 @@
 ---
-title: "Final Project"
-author: "Ethan Page, Dawson MacLean, Kasey Smith, Ella Ewoldt, Maggie Wilder"
+title: "project"
+author: "DawsonMacLean"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-library(randomForest)
-library(caret)
-
 ```
 
 ## CATAN
 
+# we need this
 ### Intro
 
-Catan is a board game where players take on the role of settlers to obtain/trade resources and build roads/settlements. Resources include sheep, lumber, wheat, clay, and ore. A player's chance of winning the game is determined by both strategy and randomness (due to dice rolls). 
+  what is Catan, where we got our data
 
-We got our data from Kaggle, and online community for data scientists. Our data contains information for 50 games with 4 players (200 entrees). The Kaggle data has information about the games such as dice rolls, number of resources gained/lost, turn order, and more. 
+  goal: compare descriptive trends in the Catan data with what a randomforest model predicts what are most important factors
 
-Data can be found here https://www.kaggle.com/datasets/lumins/settlers-of-catan-games (as well as in our project)
+  "LIE" : using just descriptive
 
-The goal of our project is to compare descriptive trends in the Catan data with what a randomforest model predicts are most important factors in who wins the game. Essentially, we are trying to find factors that predict a game win. 
-
-Our "lie" for this project will be showing how descriptives (resources, game turn, piece color, etc.) contribute to who wins the game. Our graphs will make it appear as if certain descriptives help players to win more games compared to other descriptives.
-
-In reality, the randomforest predictor model gives us a better overall view of what might be important predictors of game wins. This model contains a lot more data than our data set, so it is more likely to be less affected by outliers than our data set with only 50 games. 
-
+  "TRUTH": using randomforest model as a more reliable way to show what is actually important. While also knowing that it is incomplete
 
 
 ## Modifying Data
@@ -54,47 +46,91 @@ CatanData$color <- unlist(
 
 ```
 
-## RandomForest Probability 
-  We imported the libraries "randomForest" and "caret" from CRAN to help us create a model that could predict the likelihood of winning a Catan game given when provided with starting data. The randomForest library takes our data and does a bunch of "decision trees" based on our factors (has wood/has clay/average probability for both starting settlements/etc). It thenaverages across theses "trees" to try and get a general prediction of what factors are important for winning.
+
+# We need this
+
+Here we are gonna train a randomforest model thingy based on our 50 games. This allows us to compare descriptive information (graphs) with the randomforest model to determine predictors of winning
+
+Dawson can write most/all of this ^^
+
+```{r do_game,echo=TRUE,warning=FALSE,message=FALSE}
+#,message=FALSE
+
+
+
+#source("./simulatingCatan.R")
+
+#to give the stats n plot for a Catan game, just enter a dataset of 4-player x 50 games (like the original)
+
+
+
+#predictCatanPlayer(player, rfmodel)
+
+```
+
+# we need this 
+
+Here are the "importance" values for the rf_model. To simplify, this refers to how important a variable is in predicting the likelihood of winning
+
+
+
+  We imported the libraries "randomForest" and "caret" from CRAN to help us create a model that could predict the likelihood 
+of winning a Catan game given when provided with starting data. The randomForest library takes our data and does a bunch of 
+"decision trees" based on our factors (has wood/has clay/average probability for both starting settlements/etc). It then
+averages across theses "trees" to try and get a general prediction of what factors are important for winning.
   
   
-```{r training, file='TrainRFModel.R'}
+```{r training, file = 'TrainRFModel.R'}
+
+
 ```
 
 ```{r train_now}
-source('TrainRFModel.R')
 rf_model <- trainCatanModel(CatanData)
 
 ```
 
 
-  Then, once we have trained the model on our data, we create functions to easily use the model to calculate the probability of winning. This way we don't have to go going all this every single time). One function is to predict for an entire set of 50 games, while the other is just for predicting based on one player's game stats.  
+  Then, once we have trained the model on our data, we create functions to easily use the model to calculate the probability 
+of winning. This way we don't have to go going all this every single time). One function is to predict for an entire set of 
+50 games, while the other is just for predicting based on one player's game stats.  
   
-```{r,file='simulatingCatan.R'}
+```{r, file = 'simulatingCatan.R'} 
+
 ```
 
-  The predicted probability of winning for every single player of every game (over 200 lines) is a lot, but the "importance" analysis of the model helps to understand what factors are relevant to predicting a win. 
+  The predicted probability of winning for every single player of every game (over 200 lines) is a lot, but the "importance" 
+analysis of the model helps to understand what factors are relevant to predicting a win. 
 
 ```{r importance}
-source('simulatingCatan.R')
-imp<- importance(rf_model)
-imp
+importance(rfmodel)
 
 ```
 
-  To simplify what these mean, a *higher number* basically means that it is *more important* to being able to predict whether or not the player wins. In this we see the "better numbers" (higher probability of rolling them on average) your settlements are on is the most important factor by far
-  . This is followed by turn order. Resources, whether that be resource diversity or having specific  resources at the start, did not seem to be as important predictors.
+  To simplify what these mean, a *higher number* basically means that it is *more important* to being able to predict
+whether or not the player wins. In this we see the "better numbers" (higher probability of rolling them on average) your 
+settlements are on is the most important factor by far, with a value of {r importance(rfmodel)$avg_prob}. This is followed 
+by turn order ({r importance(rfmodel)$turn_order}). Resources, whether that be resource diversity or having specific 
+resources at the start, did not seem to be as important predictors.
 
 
+```{r importance}
+
+
+#print(predictCatan)
+
+#print(predictCatanPlayer)
+#file='your-script.R'
+
+```
 
 ## Descriptive Data Graphs
-Here we take a different approach and graph the data to try and gleam information from that.
 
 
-### Win rate by turn order
+### Win rate by Color
+Here are graphs showing descriptive characteritics of the oringal CatanData dataset.  
 
-  Here it suggests that going 2nd and 3rd most often appeared in winning players  
-  
+# *describe win by turn num*
 
 
 ```{r win_by_turn_num,echo=TRUE,warning=FALSE,message=FALSE}
@@ -226,45 +262,39 @@ ggplot(win_rate_resource, aes(x = resource, y = win_rate, fill = resource)) +
 
 ```
 
+# we nee conclusion
 
-## Analysis
+## Conclusions
 
+### Conclusions based on Graphs
 
-From both the descriptive graphs and the randomForest predictor model, we see a different emphasis of important factors.
+  player 2 is the best, I think wheat is the best not sure  
+  
+  just describe what the plots would suggest is important
+  
+  
+  
+### Conclusions based on RandomForest
 
-The graphs appear to show that your choice of *piece color* and *starting resources* would make a large impact, but this not necessarily the case.
+  probaly will put up the importance chart thing again
+  
+  explain what it probably means
+  
+  
+  
+### Differences
 
-The *color* of tokens chosen was generated randomly by us at the start, therefore the variance we see in the graph is purely due to chance (you can see this effect in action by changing the set seed before sampling).
+  explain what is different quickly
+  
+  
+  probably will put in a short predictCatanPlayer() thing where we will only differ the color, to show how that compares with the gra  phs
+  
+  any difference with color being significant should mean nothing
+  
+  
+## yippee we done
 
-```{r predicting}
-#copying data from row 1
-data1 <- CatanData[1,]
-#changing the color to blue
-data1$color <- "blue"
+short goodbe conclusion
+  
+  
 
-#predicting chance of winning
-predictCatanPlayer(data1,rf_model)
-
-
-#changing color to red
-data1$color <- "red"
-
-#predicting now
-predictCatanPlayer(data1,rf_model)
-
-
-```
-
-This short code above also reaffirms that color does not affect the probability of winning. The probability of winning is the same (`r predictCatanPlayer(data1,rf_model)`) regardless of the color "chosen".
-
-
-The specific starting *resources* also appear to be important to distinguish, but the importance model shows that individual resources have a relatively low importance (factors has_clay and has_wood in the single digit levels). What appears to matter more is not the type of resource, but rather the average probability of obtaining your resource (whatever they might be) based on the number of the resource.
-
-
-The graph showing wins by turn order does seem to be relevant. The randomForest model's second highest importance factor was that of turn_order. This suggests that the most common turn orders appearing in winning players (2nd and 3rd) may actually be quite important in determining your success in Catan.
-
-
-```{r}
-#for reference
-imp
-```
