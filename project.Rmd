@@ -11,16 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## CATAN
 
-# we need this
 ### Intro
 
-  what is Catan, where we got our data
+Catan is a board game where players take on the role of settlers to obtain/trade resources and build roads/settlements. Resources include sheep, lumber, wheat, clay, and ore. A player's chance of winning the game is determined by both strategy and randomness (due to dice rolls). 
 
-  goal: compare descriptive trends in the Catan data with what a randomforest model predicts what are most important factors
+We got our data from Kaggle, and online community for data scientists. Our data contains information for 50 games with 4 players (200 entrees). The Kaggle data has information about the games such as dice rolls, number of resources gained/lost, turn order, and more. 
 
-  "LIE" : using just descriptive
+The goal of our project is to compare descriptive trends in the Catan data with what a randomforest model predicts are most important factors in who wins the game. Essentially, we are trying to find factors that predict a game win. 
 
-  "TRUTH": using randomforest model as a more reliable way to show what is actually important. While also knowing that it is incomplete
+Our "lie" for this project will be showing how descriptives (resources, game turn, piece color, etc.) contribute to who wins the game. Our graphs will make it appear as if certain descriptives help players to win more games compared to other descriptives.
+
+In reality, the randomforest predictor model gives us a better overall view of what might be important predictors of game wins. This model contains a lot more data than our data set, so it is more likely to be less affected by outliers than our data set with only 50 games. 
+
 
 
 ## Modifying Data
